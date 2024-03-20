@@ -40,14 +40,13 @@ class ModularDataModule(LightningDataModule):
         self.data_dir = data_dir
         self.agents = agents
 
-        self.labels = dict()
+        self.dataset_names = []
         for i, agent in enumerate(agents):
             num_agent_datasets = len(agent['data'])
             for i in range(num_agent_datasets):
-                try:
-                    self.labels[agent['data'][i]['dataset']] += agent['data'][i]['labels']
-                except KeyError:
-                    self.labels[agent['data'][i]['dataset']] = agent['data'][i]['labels']
+                if agent['data'][i]['dataset'] not in self.dataset_names:
+                    self.dataset_names.append(agent['data'][i]['dataset'])
+
 
         self.cache_dir = cache_dir
 
@@ -95,19 +94,19 @@ class ModularDataModule(LightningDataModule):
 
     def prepare_data(self):
         # Download datasets if not already present
-        for dataset_name in self.labels:
+        for dataset_name in self.dataset_names:
             self.load_dataset(dataset_name, train=True, transform=self.transforms[dataset_name])
 
     def setup(self, stage=None):
         self.agent_datasets = {agent["id"]: dict() for agent in self.agents}
         train_datasets = {dataset_name: self.load_dataset(dataset_name,
                                                          train=True,
-                                                         transform=self.transforms[dataset_name]) for dataset_name in self.labels}
+                                                         transform=self.transforms[dataset_name]) for dataset_name in self.dataset_names}
         test_datasets = {dataset_name: self.load_dataset(dataset_name,
                                                          train=False,
-                                                         transform=self.transforms[dataset_name]) for dataset_name in self.labels}
+                                                         transform=self.transforms[dataset_name]) for dataset_name in self.dataset_names}
 
-        for dataset_name in self.labels:
+        for dataset_name in self.dataset_names:
             config_key = f"{dataset_name}"
             if config_key not in self.cache:
                 print(f"Creating labels cache for {dataset_name}...")

@@ -28,7 +28,9 @@ if __name__=="__main__":
     checkpoint_callback = ModelCheckpoint(monitor="val_acc", mode="max")
 
     # Define your model here
-    model = DiNNO(config=config)
+    model = DiNNO(agents=config["agents"],
+                  graph_type=config["graph_type"],
+                  fiedler_value=config["fiedler_value"])
 
     # Define the datamodule here
     datamodule = ModularDataModule(
