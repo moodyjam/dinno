@@ -10,7 +10,7 @@ decoder = nn.Sequential(nn.Linear(3, 64), nn.ReLU(), nn.Linear(64, 28 * 28))
 
 # define the LightningModule
 class DiNNO(L.LightningModule):
-    def __init__(self, models):
+    def __init__(self, config):
         super().__init__()
         self.encoder = encoder
         self.decoder = decoder
@@ -31,8 +31,5 @@ class DiNNO(L.LightningModule):
         optimizer = optim.Adam(self.parameters(), lr=1e-3)
         return optimizer
 
-
-# init the autoencoder
-autoencoder = LitAutoEncoder(encoder, decoder)
         
         

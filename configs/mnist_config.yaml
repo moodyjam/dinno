@@ -1,0 +1,51 @@
+agents:
+  - id: agent0
+    data:
+      - dataset: MNIST
+        labels: [0]  
+  - id: agent1
+    data:
+      - dataset: MNIST
+        labels: [1]
+  - id: agent2
+    data:
+      - dataset: MNIST
+        labels: [2]
+  - id: agent3
+    data:
+      - dataset: MNIST
+        labels: [3]
+  - id: agent4
+    data:
+      - dataset: MNIST
+        labels: [4]
+  - id: agent5
+    data:
+      - dataset: MNIST
+        labels: [5]
+  - id: agent6
+    data:
+      - dataset: MNIST
+        labels: [6]
+  - id: agent7
+    data:
+      - dataset: MNIST
+        labels: [7]
+  - id: agent8
+    data:
+      - dataset: MNIST
+        labels: [8]
+  - id: agent9
+    data:
+      - dataset: MNIST
+        labels: [9]
+  - id: mnist
+    data:
+      - dataset: MNIST
+        labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+batch_size: 64
+num_workers: 0
+run_name: dinno_mnist
+max_epochs: 10
+gpus: 1
+accelerator: gpu
