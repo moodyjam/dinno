@@ -30,7 +30,7 @@ class ModularDataModule(LightningDataModule):
     """
     def __init__(self, data_dir: str = "./datasets",
                  batch_size: int = 32,
-                 agents: List = None,
+                 agent_config: List = None,
                  cache_dir: str = "./cache",
                  validation_split: float = 0.1,
                  custom_transforms: dict = None,
@@ -38,10 +38,10 @@ class ModularDataModule(LightningDataModule):
         
         super().__init__()
         self.data_dir = data_dir
-        self.agents = agents
+        self.agent_config = agent_config
 
         self.dataset_names = []
-        for i, agent in enumerate(agents):
+        for i, agent in enumerate(agent_config):
             num_agent_datasets = len(agent['data'])
             for i in range(num_agent_datasets):
                 if agent['data'][i]['dataset'] not in self.dataset_names:
@@ -98,7 +98,7 @@ class ModularDataModule(LightningDataModule):
             self.load_dataset(dataset_name, train=True, transform=self.transforms[dataset_name])
 
     def setup(self, stage=None):
-        self.agent_datasets = {agent["id"]: dict() for agent in self.agents}
+        self.agent_datasets = {agent["id"]: dict() for agent in self.agent_config}
         train_datasets = {dataset_name: self.load_dataset(dataset_name,
                                                          train=True,
                                                          transform=self.transforms[dataset_name]) for dataset_name in self.dataset_names}
@@ -133,7 +133,7 @@ class ModularDataModule(LightningDataModule):
                 self.save_cache()
 
         # Loop through the different agents
-        for agent in self.agents:
+        for agent in self.agent_config:
             num_agent_datasets = len(agent['data'])
             agent_id = agent['id']
             agent_train_dataset, agent_val_dataset, agent_test_dataset = [], [], []
@@ -158,7 +158,7 @@ class ModularDataModule(LightningDataModule):
                                   batch_size=self.hparams.batch_size,
                                   shuffle=True,
                                   pin_memory=True,
-                                  num_workers=self.hparams.num_workers) for agent in self.agents]
+                                  num_workers=self.hparams.num_workers) for agent in self.agent_config]
         return dataloaders
 
     def val_dataloader(self):
@@ -167,7 +167,7 @@ class ModularDataModule(LightningDataModule):
                                   batch_size=self.hparams.batch_size,
                                   shuffle=False,
                                   pin_memory=True,
-                                  num_workers=self.hparams.num_workers) for agent in self.agents]
+                                  num_workers=self.hparams.num_workers) for agent in self.agent_config]
         return dataloaders
     
     def test_dataloader(self):
@@ -176,7 +176,7 @@ class ModularDataModule(LightningDataModule):
                                   batch_size=self.hparams.batch_size,
                                   shuffle=False,
                                   pin_memory=True,
-                                  num_workers=self.hparams.num_workers) for agent in self.agents]
+                                  num_workers=self.hparams.num_workers) for agent in self.agent_config]
         return dataloaders
 
 

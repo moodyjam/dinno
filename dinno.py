@@ -6,6 +6,7 @@ import lightning as L
 from util import create_graph
 from copy import deepcopy
 import torch
+from agent import Agent
 
 class ConvNeuralNet(nn.Module):
 	#  Simple Convolutional Neural Net Implementation of DiNNO Architecture
@@ -26,36 +27,36 @@ class ConvNeuralNet(nn.Module):
 
 # define the LightningModule
 class DiNNO(L.LightningModule):
-    def __init__(self, agents, graph_type="complete", fiedler_value=None, num_classes=10):
+    def __init__(self, agent_config, graph_type="complete", fiedler_value=None, num_classes=10):
         super().__init__()
         self.graph_type = graph_type
         self.fiedler_value = fiedler_value
-        self.num_nodes = len(agents)
+        self.num_nodes = len(agent_config)
         self.G, self.G_connectivity = create_graph(num_nodes = self.num_nodes,
                                                    graph_type = graph_type,
                                                    target_connectivity = fiedler_value)
         
         base_model = ConvNeuralNet(num_classes=num_classes)
-        self.agent_to_idx = {agent["id"]: i for i, agent in enumerate(agents)}
+        self.agent_to_idx = {agent["id"]: i for i, agent in enumerate(agent_config)}
 
         # Initialize the networks for each agent
-        self.models = nn.ModuleDict({agent["id"]: deepcopy(base_model) for agent in agents})
-        self.agents = agents
-
-        # Initialize the dual variables
-        params = torch.nn.utils.parameters_to_vector(base_model.parameters())
-        self.register_buffer("duals", torch.stack([torch.zeros_like(params) for agent in agents]))
+        self.models = nn.ModuleDict({agent["id"]: deepcopy(base_model) for agent in agent_config})
+        self.agent_config = agent_config
+        self.agents = {agent["id"]: Agent(config=agent_config[i],
+                                          model=deepcopy(base_model))
+                                          for i, agent in enumerate(self.agent_config)}
         
     def training_step(self, batch, batch_idx):
         # training_step defines the train loop.
         # it is independent of forward
 
         # Communicate
-        # FIXME Need to create an agent class
-        for agent in self.agents:
-            agent_idx = self.agent_to_idx[agent["id"]]
-            agent_params_vec = torch.nn.utils.parameters_to_vector(self.models[agent["id"]].parameters())
-            for neighbor_idx in self.G.neighbors():
+        for agent_id in self.agents:
+            agent_idx = self.agent_to_idx[agent_id]
+            curr_agent = self.agents[agent_id]
+            agent_params_vec = torch.nn.utils.parameters_to_vector(curr_agent.model.parameters())
+            for neighbor_idx in self.G.neighbors(agent_idx):
+                print()
 
         x, y = batch
         x = x.view(x.size(0), -1)

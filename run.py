@@ -14,7 +14,7 @@ def load_config(config_path):
 if __name__=="__main__":
 
     parser = argparse.ArgumentParser(description='Train a Model with PyTorch Lightning')
-    parser.add_argument('--config', type=str, default='config.yaml', help='Path to config file')
+    parser.add_argument('--config', type=str, default='configs/mnist_config.yaml', help='Path to config file')
 
     args = parser.parse_args()
 
@@ -28,14 +28,14 @@ if __name__=="__main__":
     checkpoint_callback = ModelCheckpoint(monitor="val_acc", mode="max")
 
     # Define your model here
-    model = DiNNO(agents=config["agents"],
+    model = DiNNO(agent_config=config["agents"],
                   graph_type=config["graph_type"],
                   fiedler_value=config["fiedler_value"])
 
     # Define the datamodule here
     datamodule = ModularDataModule(
         batch_size=config['batch_size'],
-        agents=config['agents'],
+        agent_config=config['agents'],
         num_workers=config['num_workers'],
     )
 
