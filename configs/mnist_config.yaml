@@ -39,11 +39,11 @@ agents:
     data:
       - dataset: MNIST
         labels: [9]
-batch_size: 64
+batch_size: 128
 num_workers: 0
 run_name: dinno_mnist
 max_epochs: 10
 gpus: 1
 accelerator: gpu
-graph_type: random
+graph_type: complete
 fiedler_value: 0.7

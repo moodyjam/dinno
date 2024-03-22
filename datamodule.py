@@ -162,21 +162,23 @@ class ModularDataModule(LightningDataModule):
 
     def val_dataloader(self):
         # Return a list of validation DataLoaders for MNIST and Fashion MNIST
-        dataloaders = [DataLoader(self.agent_datasets[agent["id"]]["val"],
-                                  batch_size=self.hparams.batch_size,
-                                  shuffle=False,
-                                  pin_memory=True,
-                                  num_workers=self.hparams.num_workers) for agent in self.agent_config]
-        return dataloaders
+        full_dataset = ConcatDataset([self.agent_datasets[agent["id"]]["val"] for agent in self.agent_config])
+        dataloader = DataLoader(full_dataset,
+                                batch_size=self.hparams.batch_size,
+                                shuffle=False,
+                                pin_memory=True,
+                                num_workers=self.hparams.num_workers)
+        return dataloader
     
     def test_dataloader(self):
         # Return a list of validation DataLoaders for MNIST and Fashion MNIST
-        dataloaders = [DataLoader(self.agent_datasets[agent["id"]]["test"],
-                                  batch_size=self.hparams.batch_size,
-                                  shuffle=False,
-                                  pin_memory=True,
-                                  num_workers=self.hparams.num_workers) for agent in self.agent_config]
-        return dataloaders
+        full_dataset = ConcatDataset([self.agent_datasets[agent["id"]]["test"] for agent in self.agent_config])
+        dataloader = DataLoader(full_dataset,
+                                batch_size=self.hparams.batch_size,
+                                shuffle=False,
+                                pin_memory=True,
+                                num_workers=self.hparams.num_workers)
+        return dataloader
 
 
 
