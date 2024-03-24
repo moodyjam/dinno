@@ -30,7 +30,8 @@ if __name__=="__main__":
     # Define your model here
     model = DiNNO(agent_config=config["agents"],
                   graph_type=config["graph_type"],
-                  fiedler_value=config["fiedler_value"])
+                  fiedler_value=config["fiedler_value"],
+                  oits=config["max_steps"])
 
     # Define the datamodule here
     datamodule = ModularDataModule(
@@ -41,7 +42,7 @@ if __name__=="__main__":
 
     # Define the trainer here
     trainer = Trainer(
-        max_epochs=config['max_epochs'],
+        max_steps=config['max_steps'],
         devices=config['gpus'] if config['gpus'] > 0 else None,
         accelerator=config['accelerator'],
         callbacks=[checkpoint_callback],

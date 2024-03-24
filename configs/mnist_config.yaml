@@ -42,8 +42,8 @@ agents:
 batch_size: 128
 num_workers: 0
 run_name: dinno_mnist
-max_epochs: 10
+max_steps: 2000
 gpus: 1
-accelerator: gpu
+accelerator: cpu
 graph_type: complete
 fiedler_value: 0.7
