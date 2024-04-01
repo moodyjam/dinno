@@ -66,6 +66,7 @@ class DiNNO(L.LightningModule):
                                           idx=i)
                                           for i, agent in enumerate(self.agent_config)})
         
+        # Set automatic optimization to false
         self.automatic_optimization = False
         self.criterion = torch.nn.NLLLoss()
         self.rho = rho
@@ -90,6 +91,7 @@ class DiNNO(L.LightningModule):
         # training_step defines the train loop.
         # it is independent of forward
 
+        
         for agent_id in self.agents:
             curr_agent = self.agents[agent_id]
             curr_agent.set_flattened_params()
@@ -102,6 +104,8 @@ class DiNNO(L.LightningModule):
             neighbor_indices = self.G.neighbors(curr_agent.idx)
             neighbor_params = torch.stack([self.agents[self.agent_config[idx]['id']].get_flattened_params() for idx in neighbor_indices])
             theta = curr_agent.get_flattened_params()
+            
+            # DUAL VARIABLE UPDATE
             curr_agent.dual += self.rho * (theta - neighbor_params).sum(0)
             theta_reg = (theta + neighbor_params) / 2
             curr_batch = batch[curr_agent.idx]
@@ -115,6 +119,8 @@ class DiNNO(L.LightningModule):
             
             # Loop through B times for the current agent
             for tau in range(self.hparams.B):
+                
+                # PRIMAL UPDATE
                 x_split = x[tau*split_size:(tau+1)*split_size]
                 y_split = y[tau*split_size:(tau+1)*split_size]
                 opt.zero_grad()
